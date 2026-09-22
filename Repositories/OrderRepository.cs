@@ -1,5 +1,6 @@
 ﻿using Asal.OrderReportingSystem.Interfaces;
 using Asal.OrderReportingSystem.Models;
+using Asal.OrderReportingSystem.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -59,16 +60,22 @@ namespace Asal.OrderReportingSystem.Repositories
 
         public bool AddOrder(Guid CustomerId, decimal Amount)
         {
-            var customer=_customers.GetCustomerById(CustomerId);
+            var customer = _customers.GetCustomerById(CustomerId);
+
             if (customer is null)
-                throw new InvalidOperationException("there's not customer with this id!!!");
+                throw new InvalidOperationException("There's no customer with this ID.");
+
             var order = new Order
             {
                 OrderId = Guid.NewGuid(),
                 Customer = customer,
-                OrderStatus=OrderStatus.Pending,
-                CreatedDate = DateTime.Now,
+                OrderTotalAmount = Amount,
+                OrderStatus = OrderStatus.Pending,
+                CreatedDate = DateTime.Now
             };
+
+            _orders.Add(order);
+
             return true;
         }
 
@@ -94,7 +101,8 @@ namespace Asal.OrderReportingSystem.Repositories
 
         public Customer GetCustomerWithHighestOrdersAmount()
         {
-            
+            var customerAmounts = _orders.GroupBy(o => o.Customer).ToDictionary(g => g.Key,g => g.Sum(o => o.OrderTotalAmount));
+            return customerAmounts.MaxBy(x => x.Value).Key;
         }
 
         public Order? GetOrderById(Guid OrderId)
@@ -118,12 +126,28 @@ namespace Asal.OrderReportingSystem.Repositories
 
         public List<Order> GetOrdersSortedByAmount()
         {
-            throw new NotImplementedException();
+            var sortType = MyUtilities.GetSortType();
+
+            if (sortType)
+                return _orders.OrderBy(o => o.OrderTotalAmount).ToList();
+            else
+            {
+                return _orders.OrderByDescending(o => o.OrderTotalAmount).ToList();
+
+            }
         }
 
         public List<Order> GetOrdersSortedByDate()
         {
-            throw new NotImplementedException();
+            var sortType = MyUtilities.GetSortType();
+
+            if (sortType)
+                return _orders.OrderBy(o => o.CreatedDate).ToList();
+            else
+            {
+                return _orders.OrderByDescending(o => o.CreatedDate).ToList();
+
+            }
         }
 
         public decimal GetOrdersTotalAmount()
