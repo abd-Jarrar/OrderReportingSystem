@@ -10,5 +10,6 @@ namespace Asal.OrderReportingSystem.Models
         public string CustomerName { get; set; } = null!;
 
         public string CustomerEmail { get; set; } = null!;
+        public List<Order> CustomerOrders { get; set; } = new();
     }
 }
