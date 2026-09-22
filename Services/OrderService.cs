@@ -25,7 +25,19 @@ namespace Asal.OrderReportingSystem.Services
         }
         public void DisplayAllOrders()
         {
-            _repository.DisplayAllOrders();
+            try
+            {
+                var orders = _repository.GetAllOrders();
+
+                if (orders is null || orders.Count == 0)
+                    throw new InvalidOperationException("No orders found.");
+
+                MyUtilities.PrintOrders(orders);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public void DisplayOrdersWithin()
@@ -37,10 +49,19 @@ namespace Asal.OrderReportingSystem.Services
             {
                 if (endDate < startDate)
                     throw new ArgumentException("End date cannot be before start date.");
-                var orders=_repository.DisplayOrdersWithin(startDate, endDate);
-                _repository.PrintOrders(orders);
+
+                var orders = _repository.GetOrdersWithin(startDate, endDate);
+
+                if (orders.Count == 0)
+                    throw new InvalidOperationException("No orders found within this date range.");
+
+                MyUtilities.PrintOrders(orders);
             }
             catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (InvalidOperationException ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -48,8 +69,19 @@ namespace Asal.OrderReportingSystem.Services
 
         public void DisplayCompletedOrders()
         {
-            var orders=_repository.GetCompletedOrders();
-            _repository.PrintOrders(orders);
+            try
+            {
+                var orders = _repository.GetCompletedOrders();
+
+                if (orders.Count == 0)
+                    throw new InvalidOperationException("No completed orders found.");
+
+                MyUtilities.PrintOrders(orders);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public void DisplayCustomerOrdersTotalAmount()
@@ -104,9 +136,22 @@ namespace Asal.OrderReportingSystem.Services
 
         public void DisplayOrdersAbove()
         {
-            decimal amount = MyUtilities.ReadPositiveAmount("Enter The amount: ");
-            var orders=_repository.GetOrdersAbove(amount);
-            _repository.PrintOrders(orders);
+            decimal amount = MyUtilities.ReadPositiveAmount("Enter the amount: ");
+
+            try
+            {
+                var orders = _repository.GetOrdersAbove(amount);
+
+                if (orders.Count == 0)
+                    throw new InvalidOperationException(
+                        $"No orders found above {amount:C}.");
+
+                MyUtilities.PrintOrders(orders);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public void DisplayOrdersBySpecificCustomer()
@@ -117,7 +162,10 @@ namespace Asal.OrderReportingSystem.Services
 
                 var orders = _repository.GetOrdersBySpecificCustomer(customerId);
 
-                _repository.PrintOrders(orders);
+                if (orders.Count == 0)
+                    throw new InvalidOperationException("This customer has no orders.");
+
+                MyUtilities.PrintOrders(orders);
             }
             catch (InvalidOperationException ex)
             {
@@ -127,22 +175,20 @@ namespace Asal.OrderReportingSystem.Services
 
         public void DisplayOrdersSortedByAmount()
         {
-            var orders = _repository.GetOrdersSortedByAmount();
+            bool ascending = MyUtilities.GetSortType();
 
-            foreach (var order in orders)
-            {
-                MyUtilities.PrintOrder(order);
-            }
+            var orders = _repository.GetOrdersSortedByAmount(ascending);
+
+            MyUtilities.PrintOrders(orders);
         }
 
         public void DisplayOrdersSortedByDate()
         {
-            var orders = _repository.GetOrdersSortedByDate();
+            bool ascending = MyUtilities.GetSortType();
 
-            foreach (var order in orders)
-            {
-                MyUtilities.PrintOrder(order);
-            }
+            var orders = _repository.GetOrdersSortedByDate(ascending);
+
+            MyUtilities.PrintOrders(orders);
         }
 
         public void DisplayOrdersTotalAmount()

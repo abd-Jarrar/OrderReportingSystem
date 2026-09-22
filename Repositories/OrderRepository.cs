@@ -79,12 +79,12 @@ namespace Asal.OrderReportingSystem.Repositories
             return true;
         }
 
-        public void DisplayAllOrders()
+        public List<Order> GetAllOrders() 
         {
-            PrintOrders(_orders);
+             return _orders;
         }
 
-        public List<Order> DisplayOrdersWithin(DateTime StartDate, DateTime EndDate)
+        public List<Order> GetOrdersWithin(DateTime StartDate, DateTime EndDate)
         {
             return _orders.Where(o => o.CreatedDate >= StartDate && o.CreatedDate <= EndDate).ToList();
         }
@@ -124,70 +124,24 @@ namespace Asal.OrderReportingSystem.Repositories
             return _orders.Where(o=>o.Customer.CustomerId == CustomerId).ToList();
         }
 
-        public List<Order> GetOrdersSortedByAmount()
+        public List<Order> GetOrdersSortedByAmount(bool ascending)
         {
-            var sortType = MyUtilities.GetSortType();
-
-            if (sortType)
+            if (ascending)
                 return _orders.OrderBy(o => o.OrderTotalAmount).ToList();
-            else
-            {
-                return _orders.OrderByDescending(o => o.OrderTotalAmount).ToList();
 
-            }
+            return _orders.OrderByDescending(o => o.OrderTotalAmount).ToList();
         }
 
-        public List<Order> GetOrdersSortedByDate()
+        public List<Order> GetOrdersSortedByDate(bool ascending)
         {
-            var sortType = MyUtilities.GetSortType();
-
-            if (sortType)
+            if (ascending)
                 return _orders.OrderBy(o => o.CreatedDate).ToList();
-            else
-            {
-                return _orders.OrderByDescending(o => o.CreatedDate).ToList();
 
-            }
+            return _orders.OrderByDescending(o => o.CreatedDate).ToList();
         }
-
         public decimal GetOrdersTotalAmount()
         {
             return _orders.Sum(o => o.OrderTotalAmount);
-        }
-
-        public void PrintOrder(Guid OrderId)
-        {
-            var order = _orders.FirstOrDefault(o => o.OrderId == OrderId);
-
-            if (order is null)
-            {
-                throw new InvalidOperationException("the order with this id was not found!!!");
-            }
-
-            Console.WriteLine($"Order ID: {order.OrderId}");
-            Console.WriteLine($"Customer: {order.Customer.CustomerName}");
-            Console.WriteLine($"Total Amount: {order.OrderTotalAmount:C}");
-            Console.WriteLine($"Status: {order.OrderStatus}");
-            Console.WriteLine($"Created Date: {order.CreatedDate}");
-        }
-
-        public void PrintOrders(List<Order> orders)
-        {
-            if (orders is null || orders.Count == 0)
-            {
-                Console.WriteLine("No orders found.");
-                return;
-            }
-
-            foreach (var order in orders)
-            {
-                Console.WriteLine($"Order ID: {order.OrderId}");
-                Console.WriteLine($"Customer: {order.Customer.CustomerName}");
-                Console.WriteLine($"Total Amount: {order.OrderTotalAmount:C}");
-                Console.WriteLine($"Status: {order.OrderStatus}");
-                Console.WriteLine($"Created Date: {order.CreatedDate}");
-                Console.WriteLine("-------------------------");
-            }
         }
 
     }

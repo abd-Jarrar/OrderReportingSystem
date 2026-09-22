@@ -97,6 +97,18 @@ namespace Asal.OrderReportingSystem.Utilities
             Console.WriteLine($"Created Date: {order.CreatedDate}");
         }
 
-        
+        public static void PrintOrders(List<Order> orders)
+        {
+            foreach (var order in orders)
+            {
+                Console.WriteLine($"Order ID      : {order.OrderId}");
+                Console.WriteLine($"Customer      : {order.Customer.CustomerName}");
+                Console.WriteLine($"Total Amount  : {order.OrderTotalAmount:C}");
+                Console.WriteLine($"Status        : {order.OrderStatus}");
+                Console.WriteLine($"Created Date  : {order.CreatedDate}");
+                Console.WriteLine(new string('-', 50));
+            }
+        }
+
     }
 }
