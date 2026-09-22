@@ -21,7 +21,7 @@ namespace Asal.OrderReportingSystem.Interfaces
 
         public decimal GetOrdersTotalAmount();
 
-        public decimal GetCustomerOrdersTotalAmount();
+        public Dictionary<Customer, decimal> GetCustomerOrdersTotalAmount();
 
         public Customer GetCustomerWithHighestOrdersAmount();
 
@@ -29,7 +29,7 @@ namespace Asal.OrderReportingSystem.Interfaces
 
         public List<Order> GetOrdersSortedByDate();
 
-        public void PrintOrder();
+        public void PrintOrder(Guid OrderId);
 
         public void PrintOrders(List<Order>orders);
 
